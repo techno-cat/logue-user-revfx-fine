@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    LCWFilterIir2 lpf, hpf[2];
+    LCWFilterIir2 lpf, hpf;
     LCWFilterIir1 combLpf[LCW_REVERB_COMB_MAX];
     LCWDelayBuffer preBuffer;
     LCWDelayBuffer combBuffers;
@@ -31,9 +31,8 @@ extern void LCWInitCombBuffer(LCWReverbBlock *block, float *buffer);
 extern void LCWInitApBuffer(LCWReverbBlock *block, float *buffer);
 
 extern void LCWInputPreBuffer(float *out, const float *in, LCWReverbBlock *block);
-extern void LCWInputCombLines(float *outL, float *outR, float in, LCWReverbBlock *block);
-extern float LCWInputAllPassL(float in, LCWReverbBlock *block);
-extern float LCWInputAllPassR(float in, LCWReverbBlock *block);
+extern void LCWInputCombLines(float *out, float in, LCWReverbBlock *block);
+extern float LCWInputAllPass(float in, LCWReverbBlock *block);
 
 #ifdef __cplusplus
 }

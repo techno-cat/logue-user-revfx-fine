@@ -69,16 +69,9 @@ void REVFX_INIT(uint32_t platform, uint32_t api)
         p->z1 = 0.f;
     }
 
-    {
-        const int32_t n = LCW_REVERB_AP_MAX >> 1;
-        for (int32_t i=0; i<n; i++) {
-            // L
-            reverbBlock.apFbGain[i] = 0.7f;
-            reverbBlock.apDelaySize[i] = apDelay[i];
-            // R
-            reverbBlock.apFbGain[n+i] = 0.7f;
-            reverbBlock.apDelaySize[n+i] = apDelay[i];
-        }
+    for (int32_t i=0; i<LCW_REVERB_AP_MAX; i++) {
+        reverbBlock.apFbGain[i] = 0.7f;
+        reverbBlock.apDelaySize[i] = apDelay[i];
     }
 
     {
@@ -92,8 +85,8 @@ void REVFX_INIT(uint32_t platform, uint32_t api)
         p->z1 = p->z2 = 0.f;
     }
 
-    for (int32_t i=0; i<2; i++) {
-        LCWFilterIir2 *p = &(reverbBlock.hpf[i]);
+    {
+        LCWFilterIir2 *p = &(reverbBlock.hpf);
         const float *param = lcwInputFilterParams[1];
         p->b0 = param[0];
         p->b1 = param[1];
@@ -144,23 +137,16 @@ void REVFX_PROCESS(float *xn, uint32_t frames)
             xR * sendLevel
         };
 
-        float out;
-        LCWInputPreBuffer(&out, tmp, &reverbBlock);
+        float preOut;
+        LCWInputPreBuffer(&preOut, tmp, &reverbBlock);
 
-        float combL, combR;
-        LCWInputCombLines(&combL, &combR, out, &reverbBlock);
+        float combOut;
+        LCWInputCombLines(&combOut, preOut, &reverbBlock);
 
-#if (1)
-        const float outL =
-            LCWInputAllPassL(combL * .125f, &reverbBlock);
-        const float outR =
-            LCWInputAllPassL(combR * .125f, &reverbBlock);
-#else
-        const float outL = combL * .0625f;
-        const float outR = combR * .0625f;
-#endif
-        const float yL = softclip( (dry * xL) + (wet * outL) );
-        const float yR = softclip( (dry * xR) + (wet * outR) );
+        const float out =
+            LCWInputAllPass(combOut * .125f, &reverbBlock);
+        const float yL = softclip( (dry * xL) + (wet * out) );
+        const float yR = softclip( (dry * xR) + (wet * out) );
 
         *(x++) = yL;
         *(x++) = yR;
