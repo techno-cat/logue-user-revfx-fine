@@ -144,7 +144,7 @@ void REVFX_PROCESS(float *xn, uint32_t frames)
         LCWInputCombLines(&combOut, preOut, &reverbBlock);
 
         const float out =
-            LCWInputAllPass(combOut * .125f, &reverbBlock);
+            LCWInputAllPass2(combOut * .125f, &reverbBlock);
         const float yL = softclip( (dry * xL) + (wet * out) );
         const float yR = softclip( (dry * xR) + (wet * out) );
 

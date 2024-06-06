@@ -52,26 +52,26 @@ void LCWInputCombLines(float *out, const float in, LCWReverbBlock *block)
     LCWDelayBuffer *buf = &(block->combBuffers);
     buf->pointer = LCW_DELAY_BUFFER_DEC(buf);
 
-    float tmp[LCW_REVERB_COMB_MAX];
     const uint32_t mask = buf->mask;
+    const int32_t pointer = buf->pointer;
+
+    float tmp[LCW_REVERB_COMB_MAX];
     for (int32_t i=0; i<LCW_REVERB_COMB_MAX; i++) {
         float *p = buf->buffer + (LCW_REVERB_COMB_SIZE * i);
         // -1は、ディレイラインの手前にある1次のIIRを考慮した結果
-        const int32_t j = buf->pointer + block->combDelaySize[i] - 1;
-        tmp[i] = p[(uint32_t)j & mask];
+        const int32_t j = pointer + block->combDelaySize[i] - 1;
+        const float fbGain = block->combFbGain[i];
+        LCWFilterIir1 *lpf = &(block->combLpf[i]);
 
         // フィードバックを加算
-#if (1)
-        p[buf->pointer] = iir1_input_opt(
-            &(block->combLpf[i]), in + (tmp[i] * block->combFbGain[i]));
-#else
-        p[buf->pointer] = in + (tmp[i] * block->combFbGain[i]);
-#endif
+        const float zn = p[(uint32_t)j & mask];
+        p[pointer] = iir1_input_opt(lpf, in + (zn * fbGain));
+
+        tmp[i] = zn;
     }
 
     *out = tmp[0] - tmp[1] + tmp[2] - tmp[3]
-         + tmp[4] - tmp[5] + tmp[6] - tmp[7]
-         + tmp[8] - tmp[9] + tmp[10] - tmp[11];
+         + tmp[4] - tmp[5] + tmp[6] - tmp[7];
 }
 
 __fast_inline float inputAllPass(float in, LCWDelayBuffer *buf, int32_t delaySize, float fbGain)
@@ -84,21 +84,20 @@ __fast_inline float inputAllPass(float in, LCWDelayBuffer *buf, int32_t delaySiz
     return zn + (in2 * fbGain);
 }
 
-float LCWInputAllPass(float in, LCWReverbBlock *block)
+float LCWInputAllPass2(float in, LCWReverbBlock *block)
 {
     const int32_t *delaySize = &(block->apDelaySize[0]);
     const float *fbGain = &(block->apFbGain[0]);
 
     float out = in;
-    const int32_t n = LCW_REVERB_AP_MAX >> 1;
-    for (int32_t i=0; i<n; i+=2) {
+    for (int32_t i=0; i<LCW_REVERB_AP_MAX; i+=2) {
         LCWDelayBuffer *buf = &(block->apBuffers[i]);
         buf->pointer = LCW_DELAY_BUFFER_DEC(buf);
         float zn = LCW_DELAY_BUFFER_LUT(buf, delaySize[i]);
 
         // 内側の処理
         zn = inputAllPass(
-            zn, &(block->apBuffers[i+1]), delaySize[i+1], fbGain[i+1]);
+            zn, buf + 1, delaySize[i+1], fbGain[i+1]);
 
         // 外側の処理
         {

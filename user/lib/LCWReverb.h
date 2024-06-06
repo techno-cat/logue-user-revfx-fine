@@ -32,7 +32,7 @@ extern void LCWInitApBuffer(LCWReverbBlock *block, float *buffer);
 
 extern void LCWInputPreBuffer(float *out, const float *in, LCWReverbBlock *block);
 extern void LCWInputCombLines(float *out, float in, LCWReverbBlock *block);
-extern float LCWInputAllPass(float in, LCWReverbBlock *block);
+extern float LCWInputAllPass2(float in, LCWReverbBlock *block);
 
 #ifdef __cplusplus
 }

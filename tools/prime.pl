@@ -33,12 +33,28 @@ else {
     close $fh;
 }
 
+if (0) {
+    srand();
+    my $base = 29.5 + rand(100) / 100;
+    my $tmp = log2(45.5 / $base);
+    my @delay_times = map {
+        $base * (2 ** ($_ * ($tmp / 7)));
+    } 0..7;
+
+    while (my @items = splice(@delay_times , 0, 4)) {
+        say join(", ", map {
+            sprintf("%.1f", $_);
+        } @items);
+    }
+
+    exit 0;
+}
+
 if (1) {
     my @delay_samples = map {
         find_prime_number( int(SAMPLING_RATE * $_ / 1_000), \@prime );
-    } ( 30.2, 31.4, 32.7, 34.0,
-        35.3, 36.7, 38.2, 39.7,
-        41.3, 43.0, 44.7, 46.5 );
+    } ( 30.2, 32.1, 34.0, 36.0,
+        38.2, 40.5, 42.9, 45.5 );
 
     say join( ', ', map sprintf("%4d", $_), @delay_samples );
 
