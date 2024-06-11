@@ -41,8 +41,8 @@ void REVFX_INIT(uint32_t platform, uint32_t api)
     // (23)  // = 48000 * 0.0005
     const int32_t apDelay[] = {
         953, 241,
-        331, 81,
-        71, 23
+        81,
+        23
     };
 
     s_param.depth = 0.f;
@@ -144,7 +144,7 @@ void REVFX_PROCESS(float *xn, uint32_t frames)
         LCWInputCombLines(&combOut, preOut, &reverbBlock);
 
         const float out =
-            LCWInputAllPass2(combOut * .125f, &reverbBlock);
+            LCWInputAllPass1(combOut * .125f, &reverbBlock);
         const float yL = softclip( (dry * xL) + (wet * out) );
         const float yR = softclip( (dry * xR) + (wet * out) );
 

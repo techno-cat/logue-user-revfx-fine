@@ -16,8 +16,8 @@ typedef struct {
     LCWFilterIir2 lpf, hpf;
     LCWFilterIir1 combLpf[LCW_REVERB_COMB_MAX];
     LCWDelayBuffer preBuffer;
-    LCWDelayBuffer combBuffers;
-    LCWDelayBuffer apBuffers[LCW_REVERB_AP_MAX];
+    LCWDelayBuffer combBuffer;
+    LCWDelayBuffer apBuffer;
     // parameter
     int32_t preDelaySize;
     float combFbGain[LCW_REVERB_COMB_MAX];
@@ -32,7 +32,7 @@ extern void LCWInitApBuffer(LCWReverbBlock *block, float *buffer);
 
 extern void LCWInputPreBuffer(float *out, const float *in, LCWReverbBlock *block);
 extern void LCWInputCombLines(float *out, float in, LCWReverbBlock *block);
-extern float LCWInputAllPass2(float in, LCWReverbBlock *block);
+extern float LCWInputAllPass1(float in, LCWReverbBlock *block);
 
 #ifdef __cplusplus
 }
