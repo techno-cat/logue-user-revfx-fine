@@ -10,15 +10,15 @@ extern "C" {
 #endif
 
 typedef struct {
-  float z1;
-  float a1;
-  float b0, b1;
+    float z1;
+    float a1;
+    float b0, b1;
 } LCWFilterIir1;
 
 typedef struct {
-  float z1, z2;
-  float a1, a2;
-  float b0, b1, b2;
+    float z1, z2;
+    float a1, a2;
+    float b0, b1, b2;
 } LCWFilterIir2;
 
 extern float iir1_input(LCWFilterIir1 *iir, float in);
