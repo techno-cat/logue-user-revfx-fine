@@ -28,7 +28,7 @@ extern float iir1_input_opt(LCWFilterIir1 *iir, float in);
 
 extern float iir2_input(LCWFilterIir2 *iir, float in);
 
-// Q = 1/sqrt(2)を想定
+// Q = 1/sqrt(2)を想定（b0とb2が同じ値）
 extern float iir2_input_opt(LCWFilterIir2 *iir, float in);
 
 #ifdef __cplusplus
